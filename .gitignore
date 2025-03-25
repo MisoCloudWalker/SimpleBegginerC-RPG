@@ -1,0 +1,25 @@
+# Игнорирование папок сборки
+bin/
+obj/
+
+# Игнорирование файлов конфигурации IDE
+*.suo
+*.user
+*.userosscache
+*.sln.cache
+*.sln.ide
+
+# Игнорирование временных и лог-файлов
+*.log
+*.tmp
+
+# Игнорирование NuGet-пакетов
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+
+# Игнорирование файлов от Rider / VS Code / Visual Studio
+.idea/
+.vscode/
+*.vs/
