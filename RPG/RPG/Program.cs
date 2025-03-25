@@ -66,7 +66,7 @@ class Program
 
 
     /// <summary>
-    /// Вылечиться
+    /// Вылечиться на определённое значение
     /// </summary>
     static void Health()
     {
