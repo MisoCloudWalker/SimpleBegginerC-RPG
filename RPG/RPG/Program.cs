@@ -35,6 +35,8 @@ class Program
     {
         while (playerHealth > 0)
         {
+            UpdateConsole(); // Очищаем экран перед обновлением информации
+
             // Выводим текущую статистику
             Console.WriteLine($"Твоё здоровье: {playerHealth} | Атака: {playerAttack}");
             Console.WriteLine($"Здоровье врага: {enemyHealth}");
@@ -64,6 +66,14 @@ class Program
         }
 
         Console.WriteLine("Ты погиб, игра окончена");
+    }
+
+    /// <summary>
+    /// Очищает экран перед выводом нового состояния игры.
+    /// </summary>
+    static void UpdateConsole()
+    {
+        Console.Clear();
     }
 
     /// <summary>
