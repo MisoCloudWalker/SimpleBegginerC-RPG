@@ -1,20 +1,26 @@
 ﻿using System;
+
 class Program
 {
     /// <summary>
-    /// Тут статистика игрока
+    /// Статистика игрока: здоровье и базовая атака.
     /// </summary>
     static int playerHealth = 100;
     static int playerAttack = 10;
 
     /// <summary>
-    /// Тут статистика противника
+    /// Статистика противника: базовый урон и здоровье.
     /// </summary>
     static int enemyAttack = 10;
     static int enemyHealth = 50;
 
     /// <summary>
-    /// Старт
+    /// Флаг, указывающий, что игрок применил защиту для следующей атаки врага.
+    /// </summary>
+    static bool shieldActive = false;
+
+    /// <summary>
+    /// Точка входа в игру.
     /// </summary>
     static void Main()
     {
@@ -22,24 +28,21 @@ class Program
         PlayGame();
     }
 
-
     /// <summary>
-    /// Основной цикл игры
+    /// Основной игровой цикл: игрок выбирает действие, затем атакует враг.
     /// </summary>
     static void PlayGame()
     {
         while (playerHealth > 0)
         {
-            UpdateConsole();
+            // Выводим текущую статистику
+            Console.WriteLine($"Твоё здоровье: {playerHealth} | Атака: {playerAttack}");
+            Console.WriteLine($"Здоровье врага: {enemyHealth}");
+            Console.WriteLine("Выбери действие: 1. Атаковать | 2. Вылечиться | 3. Защититься");
 
-            Console.WriteLine($"Твоё здоровье {playerHealth} | Атака {playerAttack} ");
+            string input = Console.ReadLine()!;
 
-            Console.WriteLine($"Здоровье врага {enemyHealth}");
-
-            Console.WriteLine($"Выбери действие: 1. Атаковать | 2. Вылечиться | 3. Защититься");
-
-            string input = Console.ReadLine();
-
+            // Обрабатываем выбор игрока
             if (input == "1")
                 Attack();
             else if (input == "2")
@@ -48,24 +51,23 @@ class Program
                 Shield();
             else
                 Console.WriteLine("Некорректный ввод");
+
+            // Если враг побежден, завершаем бой
             if (enemyHealth <= 0)
+            {
                 EndGame();
-            else
-                EnemyAttack();
+                return;
+            }
+
+            // Ход врага
+            EnemyAttack();
         }
+
         Console.WriteLine("Ты погиб, игра окончена");
     }
 
     /// <summary>
-    /// Метод, который очищает экран (стирает прошлые действия в строке)
-    /// </summary>
-    static void UpdateConsole()
-    {
-        Console.SetCursorPosition(0, 1);
-    }
-
-    /// <summary>
-    /// Атака по врагу
+    /// Метод атаки: уменьшает здоровье противника на величину атаки игрока.
     /// </summary>
     static void Attack()
     {
@@ -73,9 +75,8 @@ class Program
         Console.WriteLine($"Ты атаковал врага на {playerAttack} урона");
     }
 
-
     /// <summary>
-    /// Вылечиться на определённое значение
+    /// Метод лечения: увеличивает здоровье игрока на 20 единиц.
     /// </summary>
     static void Recover()
     {
@@ -83,46 +84,37 @@ class Program
         Console.WriteLine($"Ты восстановил 20 здоровья, теперь у тебя {playerHealth} здоровья");
     }
 
-
     /// <summary>
-    /// Уменьшение урона по игроку
+    /// Метод защиты: снижает урон следующей атаки врага вдвое.
     /// </summary>
     static void Shield()
     {
-        enemyAttack /= 2;
-        Console.WriteLine($"Ты защитился, у противника уменьшился урон! И теперь он наносит {enemyAttack} урона");
+        shieldActive = true; // Активируем флаг защиты
+        Console.WriteLine("Ты защитился! Следующая атака врага будет ослаблена.");
     }
 
-
     /// <summary>
-    /// Враг атакует игрока
+    /// Метод атаки противника: если защита активна, урон уменьшается вдвое.
     /// </summary>
     static void EnemyAttack()
     {
-        playerHealth -= enemyAttack;
-        Console.WriteLine($"Враг атаковал тебя на {enemyAttack} и теперь у тебя {playerHealth} здоровья");
+        int damage = enemyAttack;
+
+        if (shieldActive)
+        {
+            damage /= 2; // Временное уменьшение урона
+            shieldActive = false; // Сбрасываем флаг защиты
+        }
+
+        playerHealth -= damage;
+        Console.WriteLine($"Враг атаковал тебя на {damage} урона, теперь у тебя {playerHealth} здоровья");
     }
 
-
     /// <summary>
-    /// Реализация продвижения игры (прокачка персонажа) | нужно понять как сделать новый энкаунтер с противником + добавить каких-нибудь диалогов
-    /// </summary>
-    static void LevelUp()
-    {
-        Console.WriteLine("Ты победил, твой уровень повышен и урон стал больше, но не только у тебя)");
-        playerAttack += 4;
-        enemyHealth = 50;
-        enemyAttack += 5;
-        playerHealth += 5;
-    }
-    
-
-    /// <summary>
-    /// Конец игры
+    /// Метод завершения боя: выводит сообщение о победе.
     /// </summary>
     static void EndGame()
     {
-        Console.WriteLine("Ты победил! Отправь секретное словосочестание автору и получи приз!");
-        Console.WriteLine("Секретное словосочетание: покажи собаку");
+        Console.WriteLine("Ты победил! Поздравляю!");
     }
 }
