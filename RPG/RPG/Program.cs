@@ -1,130 +1,43 @@
-﻿using System;
+﻿using System; // Это подключает основные команды C#, например, для работы с консолью.
 
-class Program
+namespace RPG // Это как папка для нашего кода, чтобы всё было организовано.
 {
-    /// <summary>
-    /// Статистика игрока: здоровье и базовая атака.
-    /// </summary>
-    static int playerHealth = 100;
-    static int playerAttack = 10;
-
-    /// <summary>
-    /// Статистика противника: базовый урон и здоровье.
-    /// </summary>
-    static int enemyAttack = 10;
-    static int enemyHealth = 50;
-
-    /// <summary>
-    /// Флаг, указывающий, что игрок применил защиту для следующей атаки врага.
-    /// </summary>
-    static bool shieldActive = false;
-
-    /// <summary>
-    /// Точка входа в игру.
-    /// </summary>
-    static void Main()
+    class Program // Это главный класс, откуда начинается программа.
     {
-        Console.WriteLine("Добро пожаловать в игру");
-        PlayGame();
-    }
-
-    /// <summary>
-    /// Основной игровой цикл: игрок выбирает действие, затем атакует враг.
-    /// </summary>
-    static void PlayGame()
-    {
-        while (playerHealth > 0)
+        static void Main() // Это точка старта программы — как кнопка "начать".
         {
-            UpdateConsole(); // Очищаем экран перед обновлением информации
+            // Запускаем Telegram-бота, чтобы он был готов принимать команды.
+            // Даже если ты играешь в консоли, бот всё равно работает на фоне.
+            GameChatIntegration.Initialize();
+            // Пишем в консоль сообщение, чтобы пользователь знал, что бот работает.
+            Console.WriteLine("Бот запущен. Для игры в Telegram отправьте /start.");
 
-            // Выводим текущую статистику
-            Console.WriteLine($"Твоё здоровье: {playerHealth} | Атака: {playerAttack}");
-            Console.WriteLine($"Здоровье врага: {enemyHealth}");
-            Console.WriteLine("Выбери действие: 1. Атаковать | 2. Вылечиться | 3. Защититься");
+            // Спрашиваем у пользователя, хочет ли он играть в консоли.
+            Console.WriteLine("Хотите сыграть в консоли? (да/нет)");
 
-            string input = Console.ReadLine()!;
+            // Считываем, что написал пользователь. Console.ReadLine() — это как "слушать" ответ.
+            // Но оно может вернуть null (ничего), если что-то пойдёт не так (например, нажали Ctrl+C).
+            string? input = Console.ReadLine(); // Знак "?" говорит, что переменная может быть пустой (null).
 
-            // Обрабатываем выбор игрока
-            if (input == "1")
-                Attack();
-            else if (input == "2")
-                Recover();
-            else if (input == "3")
-                Shield();
-            else
-                Console.WriteLine("Некорректный ввод");
+            // Преобразуем ответ в маленькие буквы (например, "ДА" → "да"), чтобы проще проверять.
+            // Если input пустое (null), то используем пустую строку (""), чтобы не было ошибок.
+            string choice = input?.ToLower() ?? "";
 
-            // Если враг побежден, завершаем бой
-            if (enemyHealth <= 0)
+            // Проверяем, что выбрал пользователь.
+            if (choice == "да") // Если пользователь написал "да", запускаем игру в консоли.
             {
-                EndGame();
-                return;
+                // Создаём новый "управляющий игрой" объект, чтобы начать игру.
+                GameController gameController = new GameController();
+                // Запускаем игру в консоли.
+                gameController.PlayGame();
             }
-
-            // Ход врага
-            EnemyAttack();
+            else // Если пользователь написал что-то кроме "да" (например, "нет").
+            {
+                // Говорим, что можно играть в Telegram.
+                Console.WriteLine("Играйте в Telegram с помощью команд!");
+                // Ждём ввода, чтобы программа не закрылась сразу — это нужно для бота.
+                Console.ReadLine();
+            }
         }
-
-        Console.WriteLine("Ты погиб, игра окончена");
-    }
-
-    /// <summary>
-    /// Очищает экран перед выводом нового состояния игры.
-    /// </summary>
-    static void UpdateConsole()
-    {
-        Console.Clear();
-    }
-
-    /// <summary>
-    /// Метод атаки: уменьшает здоровье противника на величину атаки игрока.
-    /// </summary>
-    static void Attack()
-    {
-        enemyHealth -= playerAttack;
-        Console.WriteLine($"Ты атаковал врага на {playerAttack} урона");
-    }
-
-    /// <summary>
-    /// Метод лечения: увеличивает здоровье игрока на 20 единиц.
-    /// </summary>
-    static void Recover()
-    {
-        playerHealth += 20;
-        Console.WriteLine($"Ты восстановил 20 здоровья, теперь у тебя {playerHealth} здоровья");
-    }
-
-    /// <summary>
-    /// Метод защиты: снижает урон следующей атаки врага вдвое.
-    /// </summary>
-    static void Shield()
-    {
-        shieldActive = true; // Активируем флаг защиты
-        Console.WriteLine("Ты защитился! Следующая атака врага будет ослаблена.");
-    }
-
-    /// <summary>
-    /// Метод атаки противника: если защита активна, урон уменьшается вдвое.
-    /// </summary>
-    static void EnemyAttack()
-    {
-        int damage = enemyAttack;
-
-        if (shieldActive)
-        {
-            damage /= 2; // Временное уменьшение урона
-            shieldActive = false; // Сбрасываем флаг защиты
-        }
-
-        playerHealth -= damage;
-        Console.WriteLine($"Враг атаковал тебя на {damage} урона, теперь у тебя {playerHealth} здоровья");
-    }
-
-    /// <summary>
-    /// Метод завершения боя: выводит сообщение о победе.
-    /// </summary>
-    static void EndGame()
-    {
-        Console.WriteLine("Ты победил! Поздравляю!");
     }
 }
